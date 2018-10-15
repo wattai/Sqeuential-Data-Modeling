@@ -73,7 +73,7 @@ if __name__ is "__main__":
                   [(4+n2)/30, (20-n1-n2)/30, (6+n1)/30]])  # Father.
     chi = np.array([(18-n0-n2)/20, (10-n1)/20])
     # ---------------------------------------------------------
-
+    """
     # 4-th class example for working test. --------------------
     pi = np.array([0.6, 0.4])
     A = np.array([[0.9, 0.2],
@@ -85,7 +85,7 @@ if __name__ is "__main__":
     S = np.array([0, 0, 1])  # state allocation is "0:H, 1:T".
     chi = np.ones_like(pi)
     # ---------------------------------------------------------
-
+    """
     # execution of HMM.
     N = len(S)
     hmm = HMM(pi=pi, A=A, B=B, chi=chi)
