@@ -75,7 +75,7 @@ if __name__ is "__main__":
                   [0, 0, 0]])
     chi = (np.array([0, 0, 0, 1])) @ A.T
     # ---------------------------------------------------------
-
+    """
     # 4-th class example for working test. --------------------
     pi = np.array([1, 0, 0, 0])
     A = np.array([[0, 0.6, 0.4, 0],
@@ -91,7 +91,7 @@ if __name__ is "__main__":
     S = np.array([0, 0, 1])  # state allocation is "0:H, 1:T".
     chi = np.array([1, 1, 1, 1])
     # ---------------------------------------------------------
-
+    """
     # execution of HMM.
     N = len(S)
     hmm = exHMM(pi=pi, A=A, B=B, chi=chi)
