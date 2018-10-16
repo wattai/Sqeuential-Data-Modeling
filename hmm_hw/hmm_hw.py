@@ -23,10 +23,10 @@ class HMM():
 
     def forward(self, alpha, s):
         # s: observed state.
-        return self.B[:, s] * (self.A_f @ alpha)
+        return self.B[:, s] * (alpha @ self.A_f)
 
     def p_terminate_forward(self, alpha_tail):
-        return np.sum(self.chi * alpha_tail)
+        return np.sum(alpha_tail)
 
     def foralg(self, S):
         # n: number of iter.
@@ -36,13 +36,13 @@ class HMM():
             if n == 0:
                 alpha = self.B[:, s] * alpha
             else:
-                alpha = self.B[:, s] * (self.A_f @ alpha)
+                alpha = self.B[:, s] * (alpha @ self.A_f)
             self.alpha_list.append(alpha)
         self.p_forward = self.p_terminate_forward(alpha_tail=alpha)
 
     def backward(self, beta, s):
         # s: observed state.
-        return beta * (self.A_b @ self.B[:, s])
+        return (self.B[:, s] * beta) @ self.A_b
 
     def p_terminate_backward(self, beta_head):
         return np.sum(self.pi * self.B[:, 0] * beta_head)
@@ -52,7 +52,7 @@ class HMM():
         beta = self.chi.copy()
         self.beta_list = [beta]
         for n, s in enumerate(S[1:][::-1]):
-            beta = self.A_b @  (self.B[:, s] * beta)
+            beta = (self.B[:, s] * beta) @ self.A_b
             self.beta_list.append(beta)
         self.p_backward = self.p_terminate_backward(beta_head=beta)
 
@@ -76,8 +76,8 @@ if __name__ is "__main__":
     """
     # 4-th class example for working test. --------------------
     pi = np.array([0.6, 0.4])
-    A = np.array([[0.9, 0.2],
-                  [0.1, 0.8]])
+    A = np.array([[0.9, 0.1],
+                  [0.2, 0.8]])
     # axis=0 is num of hidden state, axis=1 is num of state.
     # B.sum(axis=1) must be 1.
     B = np.array([[0.5, 0.5],
