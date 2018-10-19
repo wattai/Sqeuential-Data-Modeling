@@ -44,8 +44,8 @@ class HMM():
         # s: observed state.
         return (self.B[:, s] * beta) @ self.A_b
 
-    def p_terminate_backward(self, beta_head):
-        return np.sum(self.pi * self.B[:, 0] * beta_head)
+    def p_terminate_backward(self, beta_head, s_head):
+        return np.sum(self.pi * self.B[:, s_head] * beta_head)
 
     def backalg(self, S):
         # n: number of iter.
@@ -54,7 +54,8 @@ class HMM():
         for n, s in enumerate(S[1:][::-1]):
             beta = (self.B[:, s] * beta) @ self.A_b
             self.beta_list.append(beta)
-        self.p_backward = self.p_terminate_backward(beta_head=beta)
+        self.p_backward = self.p_terminate_backward(beta_head=beta,
+                                                    s_head=S[0])
 
 
 if __name__ is "__main__":
@@ -76,13 +77,13 @@ if __name__ is "__main__":
     """
     # 4-th class example for working test. --------------------
     pi = np.array([0.6, 0.4])
+    S = np.array([0, 0, 1])  # state allocation is "0:H, 1:T".
     A = np.array([[0.9, 0.1],
                   [0.2, 0.8]])
     # axis=0 is num of hidden state, axis=1 is num of state.
     # B.sum(axis=1) must be 1.
     B = np.array([[0.5, 0.5],
                   [0.3, 0.7]])
-    S = np.array([0, 0, 1])  # state allocation is "0:H, 1:T".
     chi = np.ones_like(pi)
     # ---------------------------------------------------------
     """
