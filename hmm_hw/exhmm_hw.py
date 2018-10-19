@@ -41,9 +41,9 @@ class exHMM():
         # s: observed state.
         return (self.B[:, s] * beta) @ self.A_b
 
-    def p_terminate_backward(self, beta_head):
+    def p_terminate_backward(self, beta_head, s_head):
         print(self.B[:, 0] * beta_head)
-        return np.sum(self.A_b[:, 0] * self.B[:, 0] * beta_head)
+        return np.sum(self.A_b[:, 0] * self.B[:, s_head] * beta_head)
 
     def backalg(self, S):
         # n: number of iter.
@@ -52,7 +52,8 @@ class exHMM():
         for n, s in enumerate(S[1:][::-1]):
             beta = (self.B[:, s] * beta) @ self.A_b
             self.beta_list.append(beta)
-        self.p_backward = self.p_terminate_backward(beta_head=beta)
+        self.p_backward = self.p_terminate_backward(beta_head=beta,
+                                                    s_head=S[0])
 
 
 if __name__ is "__main__":
@@ -78,6 +79,7 @@ if __name__ is "__main__":
     """
     # 4-th class example for working test. --------------------
     pi = np.array([1, 0, 0, 0])
+    S = np.array([0, 0, 1])  # state allocation is "0:H, 1:T".
     A = np.array([[0, 0.6, 0.4, 0],
                   [0, 0.9, 0.1, 0],
                   [0, 0.2, 0.8, 0],
@@ -88,7 +90,6 @@ if __name__ is "__main__":
                   [0.5, 0.5],
                   [0.3, 0.7],
                   [1, 1]])
-    S = np.array([0, 0, 1])  # state allocation is "0:H, 1:T".
     chi = np.array([1, 1, 1, 1])
     # ---------------------------------------------------------
     """
