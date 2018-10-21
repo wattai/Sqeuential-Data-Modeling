@@ -26,7 +26,7 @@ class HMM():
         return self.B[:, s] * (alpha @ self.A_f)
 
     def p_terminate_forward(self, alpha_tail):
-        return np.sum(alpha_tail)
+        return np.sum(self.chi * alpha_tail, axis=0)
 
     def foralg(self, S):
         # n: number of iter.
@@ -45,7 +45,7 @@ class HMM():
         return (self.B[:, s] * beta) @ self.A_b
 
     def p_terminate_backward(self, beta_head, s_head):
-        return np.sum(self.pi * self.B[:, s_head] * beta_head)
+        return np.sum(self.pi * self.B[:, s_head] * beta_head, axis=0)
 
     def backalg(self, S):
         # n: number of iter.
