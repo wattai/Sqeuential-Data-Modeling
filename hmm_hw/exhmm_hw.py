@@ -26,7 +26,7 @@ class exHMM():
         return self.B[:, s] * (alpha @ self.A_f)
 
     def p_terminate_forward(self, alpha_tail):
-        return np.sum(alpha_tail)
+        return np.sum(self.A_f[:, -1] * alpha_tail, axis=0)
 
     def foralg(self, S):
         # n: number of iter.
@@ -43,7 +43,7 @@ class exHMM():
 
     def p_terminate_backward(self, beta_head, s_head):
         print(self.B[:, 0] * beta_head)
-        return np.sum(self.A_b[:, 0] * self.B[:, s_head] * beta_head)
+        return np.sum(self.A_b[:, 0] * self.B[:, s_head] * beta_head, axis=0)
 
     def backalg(self, S):
         # n: number of iter.
@@ -74,7 +74,7 @@ if __name__ is "__main__":
                   [n0/20, (19-n0-n1)/20, (1+n1)/20],  # Mother.
                   [(4+n2)/30, (20-n1-n2)/30, (6+n1)/30],  # Father.
                   [0, 0, 0]])
-    chi = (np.array([0, 0, 0, 1])) @ A.T
+    chi = np.array([0, 0, 0, 1]) @ A.T
     # ---------------------------------------------------------
     """
     # 4-th class example for working test. --------------------
