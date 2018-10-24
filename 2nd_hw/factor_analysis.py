@@ -44,12 +44,13 @@ if __name__ is "__main__":
 
     # [3]
     N = X.shape[1]
-    x_xt = X_dash @ X_dash.T
+    x_xt = np.diag(np.diag(X_dash @ X_dash.T))
     z_zt = np.sum(z_zt_n, axis=1, keepdims=True)
     x_zt = X_dash @ z_n.T
     print("N:\n", N)
+    print("x_xt:\n", x_xt)
     print("z_zt:\n", z_zt)
-    print("z_zt:\n", x_zt)
+    print("x_zt:\n", x_zt)
 
     # [4]
     W_hat = x_zt @ np.linalg.inv(z_zt)
