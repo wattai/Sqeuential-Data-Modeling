@@ -36,9 +36,9 @@ if __name__ is "__main__":
     E = np.eye(Wt_S_W.shape[0], Wt_S_W.shape[1])
     sigma_zx = np.linalg.inv(Wt_S_W + E)
     mu_zx = sigma_zx @ W.T @ sigma_inv @ X_dash
-
     z_n = mu_zx.copy()
     z_zt_n = np.diag(sigma_zx + (mu_zx.T @ mu_zx))[None, :]
+    print("sigma_zx:\n", sigma_zx)
     print("z_n:\n", z_n)
     print("z_zt_n:\n", z_zt_n)
 
