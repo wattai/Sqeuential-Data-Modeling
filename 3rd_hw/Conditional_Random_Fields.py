@@ -121,7 +121,7 @@ if __name__ == "__main__":
 
     # [3]
     crf.backward(beta0)
-    for i, b in enumerate(crf.beta[::-1]):
+    for i, b in enumerate(crf.beta):
         for key in b.keys():
             print('beta_%d(%s): %f' % (i, key, b[key]))
     print('')
