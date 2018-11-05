@@ -11,10 +11,9 @@ from copy import copy
 
 
 class CRFs:
-    def __init__(self, S, W_dict, W_arr, y_true):
+    def __init__(self, S, W_arr):
         self.y_true = copy(y_true)
         self.S = copy(S)
-        self.W = copy(W_dict)
         self.W_arr = copy(W_arr)
         self.alpha = None
         self.beta = None
@@ -40,8 +39,7 @@ class CRFs:
         return self.feat_dot_W_vec
 
     def softmax(self, x):
-        self.Z = np.sum(np.exp(x))
-        return np.exp(x) / self.Z
+        return np.exp(x) / np.sum(np.exp(x))
 
     def calc_p_yx(self,):
         self.p_yx = self.softmax(self.feat_dot_W_vec)
@@ -84,19 +82,16 @@ class CRFs:
         self.p_edge = prob
         return prob
 
-    def update(self, learning_rate=1.0):
+    def update(self, y_true, learning_rate=1.0):
         efc_tmp = []
         for i, seq in enumerate(list(itertools.product(*self.S))):
             efc_tmp += [np.array(list(p_edge.values())) *
                         crf.featvec_awhole(y1=seq[1], y2=seq[2])]
         self.expected_feat_cnt = np.sum(np.array(efc_tmp), axis=0)
 
-        dW_arr = np.zeros(self.expected_feat_cnt.shape)
-        for i, seq in enumerate(list(itertools.product(*self.S))):
-            dW_arr += crf.featvec_awhole(y1=seq[1],
-                                         y2=seq[2]
-                                         ) - self.expected_feat_cnt
-        self.dW_arr = np.array(dW_arr)
+        self.dW_arr = self.featvec_awhole(
+                y1=y_true[0], y2=y_true[1]) - self.expected_feat_cnt
+
         self.W_arr += learning_rate * self.dW_arr
 
 
@@ -116,8 +111,8 @@ if __name__ == "__main__":
     x3, x2, x1 = 3, 1, 7
 
     W1_arr = np.array([x3+8, x2+9, x1+10,
-                      x2+x3, x1+x2, x1+x3, x1+4, x2+6, x3+4,
-                      x1+2, x2+3]) / 20
+                       x2+x3, x1+x2, x1+x3, x1+4, x2+6, x3+4,
+                       x1+2, x2+3]) / 20
 
     S = np.array([['s'],
                   ['A', 'V', 'N'],
@@ -136,10 +131,8 @@ if __name__ == "__main__":
     alpha0 = [{S[0][0]: 1.0}, {}, {}, {}]
     beta0 = [{}, {}, {}, {S[-1][0]: 1.0}]
 
-    W1_dict = generate_weight_dict_from_arr(W1_arr, S)
-
-    y_true = [('s', 'A'), ('A', 'N'), ('N', '/s')]
-    crf = CRFs(S, W1_dict, W1_arr, y_true)
+    y_true = ('A', 'N')
+    crf = CRFs(S, W1_arr)
 
     # [1]
     print('[1] ---------------------------------------')
@@ -179,18 +172,17 @@ if __name__ == "__main__":
     # [4]
     print('[4] ---------------------------------------')
     W2_arr = np.array([x3+8, x2+9, x1+10,
-                      x2+x3, x1+x2, x1+x3, x1+2, x2+3, x3+4,
-                      x1+1, x2+2]) / 20
-    W2_dict = generate_weight_dict_from_arr(W2_arr, S)
+                       x2+x3, x1+x2, x1+x3, x1+2, x2+3, x3+4,
+                       x1+1, x2+2]) / 20
 
-    y_true = [('s', 'A'), ('A', 'N'), ('N', '/s')]
-    crf = CRFs(S, W2_dict, W2_arr, y_true)
+    y_true = ('A', 'N')
+    crf = CRFs(S, W2_arr)
     crf.calc_feat_dot_W_vec()
     crf.calc_p_yx()
     crf.forward(alpha0)
     crf.backward(beta0)
     crf.calc_p_edge()
-    crf.update(learning_rate=1.0)
+    crf.update(y_true, learning_rate=1.0)
 
     for i, pair in enumerate(pairs):
         print('dW_%s: %f' % (pair, crf.dW_arr[i]))
