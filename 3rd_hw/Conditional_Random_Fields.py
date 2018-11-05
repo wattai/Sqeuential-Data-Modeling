@@ -173,7 +173,6 @@ if __name__ == "__main__":
     # [4]
     print('[4] ---------------------------------------')
     crf.update(y_true, learning_rate=1.0)
-
     for i, pair in enumerate(pairs):
         print('dW_%s: %f' % (pair, crf.dW[i]))
     print('')
