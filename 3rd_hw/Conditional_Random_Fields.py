@@ -95,7 +95,7 @@ class CRFs:
     def update(self, y_true, learning_rate=1.0):
         efc_tmp = []
         for i, seq in enumerate(list(itertools.product(*self.S))):
-            efc_tmp += [p_edge[seq[1:3]] *
+            efc_tmp += [p_edge[seq[1:-1]] *
                         crf.featvec_awhole(y1=seq[1],
                                            y2=seq[2])]
         self.expected_feat_cnt = np.sum(np.array(efc_tmp), axis=0)
@@ -111,9 +111,9 @@ if __name__ == "__main__":
     # your number
     x3, x2, x1 = 3, 1, 7
 
-    W1_arr = np.array([x3+8, x2+9, x1+10,
-                       x2+x3, x1+x2, x1+x3, x1+4, x2+6, x3+4,
-                       x1+2, x2+3]) / 20
+    W = np.array([x3+8, x2+9, x1+10,
+                  x2+x3, x1+x2, x1+x3, x1+4, x2+6, x3+4,
+                  x1+2, x2+3]) / 20
 
     S = np.array([['s'],
                   ['A', 'V', 'N'],
@@ -133,20 +133,20 @@ if __name__ == "__main__":
     beta0 = [{}, {}, {}, {S[-1][0]: 1.0}]
 
     y_true = ('A', 'N')
-    crf = CRFs(S, W1_arr)
+    crf = CRFs(S, W)
 
     # [1]
     print('[1] ---------------------------------------')
     feat_dot_W_vec = crf.calc_feat_dot_W_vec()
     for i, seq in enumerate(list(itertools.product(*S))):
-        print('feat_dot_W_%s: %f' % (seq[1:3], feat_dot_W_vec[i]))
+        print('feat_dot_W_%s: %f' % (seq[1:-1], feat_dot_W_vec[i]))
     print('')
 
     # [2]
     print('[2] ---------------------------------------')
     p_yx = crf.calc_p_yx()
     for i, path in enumerate(paths):
-        print('prob%s: %f' % (path[1:3], p_yx[i]))
+        print('prob%s: %f' % (path[1:-1], p_yx[i]))
     print('')
 
     # [3]
