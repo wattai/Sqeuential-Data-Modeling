@@ -11,10 +11,10 @@ from copy import copy
 
 
 class CRFs:
-    def __init__(self, S, W_arr):
+    def __init__(self, S, W):
         self.y_true = copy(y_true)
         self.S = copy(S)
-        self.W_arr = copy(W_arr)
+        self.W = copy(W)
         self.alpha = None
         self.beta = None
         self.Z = None
@@ -29,16 +29,24 @@ class CRFs:
             for j, seq in enumerate(list(itertools.product(*self.S[i:i+2]))):
                 featvec += [seq in [('s', y1), (y1, y2), (y2, '/s')]]
         return np.array(featvec)
+    
+    def featvec_one_edge(self, y1, y2):
+        featvec = []
+        for i in range(len(S)-1):
+            for j, seq in enumerate(list(itertools.product(*self.S[i:i+2]))):
+                featvec += [seq in [(y1, y2)]]
+        return np.array(featvec)
 
     def calc_feat_dot_W_vec(self,):
         feat_dot_W_vec = []
         for i, seq in enumerate(list(itertools.product(*self.S))):
-            feat_dot_W = self.W_arr @ self.featvec_awhole(y1=seq[1], y2=seq[2])
+            feat_dot_W = self.W @ self.featvec_awhole(y1=seq[1], y2=seq[2])
             feat_dot_W_vec += [feat_dot_W]
         self.feat_dot_W_vec = np.array(feat_dot_W_vec)
         return self.feat_dot_W_vec
 
     def softmax(self, x):
+        print("Z: %f" % np.sum(np.exp(x)))
         return np.exp(x) / np.sum(np.exp(x))
 
     def calc_p_yx(self,):
@@ -54,7 +62,8 @@ class CRFs:
         for i in range(len(self.S)-1):  # forward
             for j, seq in enumerate(list(itertools.product(*self.S[i:i+2]))):
                 self.alpha[i+1][seq[1]] += np.exp(
-                        self.W_arr @ self.featvec_awhole(y1=seq[0], y2=seq[1])
+                        self.W @ self.featvec_one_edge(y1=seq[0],
+                                                       y2=seq[1])
                         ) * self.alpha[i][seq[0]]
                 self.Z = self.alpha[i+1][seq[1]]
 
@@ -67,7 +76,8 @@ class CRFs:
         for i in range(len(self.S)-2, -1, -1):  # backward
             for j, seq in enumerate(list(itertools.product(*self.S[i:i+2]))):
                 self.beta[i][seq[0]] += np.exp(
-                        self.W_arr @ self.featvec_awhole(y1=seq[0], y2=seq[1])
+                        self.W @ self.featvec_one_edge(y1=seq[0],
+                                                       y2=seq[1])
                         ) * self.beta[i+1][seq[1]]
 
     def calc_p_edge(self,):
@@ -76,8 +86,8 @@ class CRFs:
             for j, seq in enumerate(list(itertools.product(*self.S[i:i+2]))):
                 prob[seq] = self.alpha[i][seq[0]] * \
                             np.exp(
-                            self.W_arr @ self.featvec_awhole(y1=seq[0],
-                                                             y2=seq[1])
+                            self.W @ self.featvec_one_edge(y1=seq[0],
+                                                           y2=seq[1])
                             ) * self.beta[i+1][seq[1]] / self.Z
         self.p_edge = prob
         return prob
@@ -85,24 +95,15 @@ class CRFs:
     def update(self, y_true, learning_rate=1.0):
         efc_tmp = []
         for i, seq in enumerate(list(itertools.product(*self.S))):
-            efc_tmp += [np.array(list(p_edge.values())) *
-                        crf.featvec_awhole(y1=seq[1], y2=seq[2])]
+            efc_tmp += [p_edge[seq[1:3]] *
+                        crf.featvec_awhole(y1=seq[1],
+                                           y2=seq[2])]
         self.expected_feat_cnt = np.sum(np.array(efc_tmp), axis=0)
 
-        self.dW_arr = self.featvec_awhole(
+        self.dW = self.featvec_awhole(
                 y1=y_true[0], y2=y_true[1]) - self.expected_feat_cnt
 
-        self.W_arr += learning_rate * self.dW_arr
-
-
-def generate_weight_dict_from_arr(W_tmp, S):
-    W = {}
-    cnt = 0
-    for i in range(len(S)-1):
-        for j, seq in enumerate(list(itertools.product(*S[i:i+2]))):
-            W[seq] = W_tmp[cnt]
-            cnt += 1
-    return W
+        self.W += learning_rate * self.dW
 
 
 if __name__ == "__main__":
@@ -171,22 +172,11 @@ if __name__ == "__main__":
 
     # [4]
     print('[4] ---------------------------------------')
-    W2_arr = np.array([x3+8, x2+9, x1+10,
-                       x2+x3, x1+x2, x1+x3, x1+2, x2+3, x3+4,
-                       x1+1, x2+2]) / 20
-
-    y_true = ('A', 'N')
-    crf = CRFs(S, W2_arr)
-    crf.calc_feat_dot_W_vec()
-    crf.calc_p_yx()
-    crf.forward(alpha0)
-    crf.backward(beta0)
-    crf.calc_p_edge()
     crf.update(y_true, learning_rate=1.0)
 
     for i, pair in enumerate(pairs):
-        print('dW_%s: %f' % (pair, crf.dW_arr[i]))
+        print('dW_%s: %f' % (pair, crf.dW[i]))
     print('')
     for i, pair in enumerate(pairs):
-        print('updated_W_%s: %f' % (pair, crf.W_arr[i]))
+        print('updated_W_%s: %f' % (pair, crf.W[i]))
     print('')
