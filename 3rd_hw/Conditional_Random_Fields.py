@@ -135,47 +135,49 @@ if __name__ == "__main__":
     y_true = ('A', 'N')
     crf = CRFs(S, W)
 
-    # [1]
-    print('[1] ---------------------------------------')
-    feat_dot_W_vec = crf.calc_feat_dot_W_vec()
-    for i, seq in enumerate(list(itertools.product(*S))):
-        print('feat_dot_W_%s: %f' % (seq[1:-1], feat_dot_W_vec[i]))
-    print('')
-
-    # [2]
-    print('[2] ---------------------------------------')
-    p_yx = crf.calc_p_yx()
-    for i, path in enumerate(paths):
-        print('prob%s: %f' % (path[1:-1], p_yx[i]))
-    print('')
-
-    # [3]
-    print('[3] ---------------------------------------')
-    crf.forward(alpha0)
-    for i, a in enumerate(crf.alpha):
-        for key in a.keys():
-            print('alpha_%d(%s): %f' % (i, key, a[key]))
-    print('')
-
-    # [3]
-    crf.backward(beta0)
-    for i, b in enumerate(crf.beta):
-        for key in b.keys():
-            print('beta_%d(%s): %f' % (i, key, b[key]))
-    print('')
-
-    # [3]
-    p_edge = crf.calc_p_edge()
-    for key in p_edge.keys():
-        print('prob%s: %f' % (key, p_edge[key]))
-    print('')
-
-    # [4]
-    print('[4] ---------------------------------------')
-    crf.update(y_true, learning_rate=1.0)
-    for i, pair in enumerate(pairs):
-        print('dW_%s: %f' % (pair, crf.dW[i]))
-    print('')
-    for i, pair in enumerate(pairs):
-        print('updated_W_%s: %f' % (pair, crf.W[i]))
-    print('')
+    n_iter = 1
+    for n in range(n_iter):
+        # [1]
+        print('[1] ---------------------------------------')
+        feat_dot_W_vec = crf.calc_feat_dot_W_vec()
+        for i, seq in enumerate(list(itertools.product(*S))):
+            print('feat_dot_W_%s: %f' % (seq[1:-1], feat_dot_W_vec[i]))
+        print('')
+    
+        # [2]
+        print('[2] ---------------------------------------')
+        p_yx = crf.calc_p_yx()
+        for i, path in enumerate(paths):
+            print('prob%s: %f' % (path[1:-1], p_yx[i]))
+        print('')
+    
+        # [3]
+        print('[3] ---------------------------------------')
+        crf.forward(alpha0)
+        for i, a in enumerate(crf.alpha):
+            for key in a.keys():
+                print('alpha_%d(%s): %f' % (i, key, a[key]))
+        print('')
+    
+        # [3]
+        crf.backward(beta0)
+        for i, b in enumerate(crf.beta):
+            for key in b.keys():
+                print('beta_%d(%s): %f' % (i, key, b[key]))
+        print('')
+    
+        # [3]
+        p_edge = crf.calc_p_edge()
+        for key in p_edge.keys():
+            print('prob%s: %f' % (key, p_edge[key]))
+        print('')
+    
+        # [4]
+        print('[4] ---------------------------------------')
+        crf.update(y_true, learning_rate=1.0)
+        for i, pair in enumerate(pairs):
+            print('dW_%s: %f' % (pair, crf.dW[i]))
+        print('')
+        for i, pair in enumerate(pairs):
+            print('updated_W_%s: %f' % (pair, crf.W[i]))
+        print('')
