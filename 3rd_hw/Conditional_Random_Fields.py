@@ -95,7 +95,7 @@ class CRFs:
     def update(self, y_true, learning_rate=1.0):
         efc_tmp = []
         for i, seq in enumerate(list(itertools.product(*self.S))):
-            efc_tmp += [p_edge[seq[1:3]] *
+            efc_tmp += [p_edge[seq[1:-1]] *
                         crf.featvec_awhole(y1=seq[1],
                                            y2=seq[2])]
         self.expected_feat_cnt = np.sum(np.array(efc_tmp), axis=0)
@@ -139,14 +139,14 @@ if __name__ == "__main__":
     print('[1] ---------------------------------------')
     feat_dot_W_vec = crf.calc_feat_dot_W_vec()
     for i, seq in enumerate(list(itertools.product(*S))):
-        print('feat_dot_W_%s: %f' % (seq[1:3], feat_dot_W_vec[i]))
+        print('feat_dot_W_%s: %f' % (seq[1:-1], feat_dot_W_vec[i]))
     print('')
 
     # [2]
     print('[2] ---------------------------------------')
     p_yx = crf.calc_p_yx()
     for i, path in enumerate(paths):
-        print('prob%s: %f' % (path[1:3], p_yx[i]))
+        print('prob%s: %f' % (path[1:-1], p_yx[i]))
     print('')
 
     # [3]
