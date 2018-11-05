@@ -111,9 +111,9 @@ if __name__ == "__main__":
     # your number
     x3, x2, x1 = 3, 1, 7
 
-    W1_arr = np.array([x3+8, x2+9, x1+10,
-                       x2+x3, x1+x2, x1+x3, x1+4, x2+6, x3+4,
-                       x1+2, x2+3]) / 20
+    W = np.array([x3+8, x2+9, x1+10,
+                  x2+x3, x1+x2, x1+x3, x1+4, x2+6, x3+4,
+                  x1+2, x2+3]) / 20
 
     S = np.array([['s'],
                   ['A', 'V', 'N'],
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     beta0 = [{}, {}, {}, {S[-1][0]: 1.0}]
 
     y_true = ('A', 'N')
-    crf = CRFs(S, W1_arr)
+    crf = CRFs(S, W)
 
     # [1]
     print('[1] ---------------------------------------')
