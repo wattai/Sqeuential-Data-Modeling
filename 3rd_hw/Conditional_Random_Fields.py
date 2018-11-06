@@ -10,7 +10,7 @@ import itertools
 from copy import copy
 
 
-class CRFs:
+class LinearChainCRF:
     def __init__(self, S, W):
         self.y_true = copy(y_true)
         self.S = copy(S)
@@ -133,7 +133,7 @@ if __name__ == "__main__":
     beta0 = [{}, {}, {}, {S[-1][0]: 1.0}]
 
     y_true = ('A', 'N')
-    crf = CRFs(S, W)
+    crf = LinearChainCRF(S, W)
 
     n_iter = 1
     for n in range(n_iter):
