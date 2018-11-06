@@ -29,7 +29,7 @@ class CRFs:
             for j, seq in enumerate(list(itertools.product(*self.S[i:i+2]))):
                 featvec += [seq in [('s', y1), (y1, y2), (y2, '/s')]]
         return np.array(featvec)
-    
+
     def featvec_one_edge(self, y1, y2):
         featvec = []
         for i in range(len(S)-1):
@@ -143,14 +143,14 @@ if __name__ == "__main__":
         for i, seq in enumerate(list(itertools.product(*S))):
             print('feat_dot_W_%s: %f' % (seq[1:-1], feat_dot_W_vec[i]))
         print('')
-    
+
         # [2]
         print('[2] ---------------------------------------')
         p_yx = crf.calc_p_yx()
         for i, path in enumerate(paths):
             print('prob%s: %f' % (path[1:-1], p_yx[i]))
         print('')
-    
+
         # [3]
         print('[3] ---------------------------------------')
         crf.forward(alpha0)
@@ -158,20 +158,20 @@ if __name__ == "__main__":
             for key in a.keys():
                 print('alpha_%d(%s): %f' % (i, key, a[key]))
         print('')
-    
+
         # [3]
         crf.backward(beta0)
         for i, b in enumerate(crf.beta):
             for key in b.keys():
                 print('beta_%d(%s): %f' % (i, key, b[key]))
         print('')
-    
+
         # [3]
         p_edge = crf.calc_p_edge()
         for key in p_edge.keys():
             print('prob%s: %f' % (key, p_edge[key]))
         print('')
-    
+
         # [4]
         print('[4] ---------------------------------------')
         crf.update(y_true, learning_rate=1.0)
